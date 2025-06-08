@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transcription History - Finla.ai</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="app-header">
+        <img src="https://finla.ai/img/logo_text.svg" alt="Finla.ai Logo" class="logo-img">
+        <a href="index.html" class="btn btn-secondary" style="width: auto; padding: 0.5em 1em; text-decoration: none;">Back to Transcriber</a>
+    </header>
+
+    <div class="container">
+        <main class="main-content" style="flex-direction: column;">
+            <section class="card" style="width: 100%;">
+                <h2 class="card-title">Transcription History (Cloud & Local)</h2>
+                <ul id="transcriptionList" style="list-style: none; padding: 0;">
+                    <li class="empty-list-message">Loading history...</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer class="app-footer">
+        <p>© <span id="currentYear">2024</span> Finla.ai. For local testing and demonstration.</p>
+    </footer>
+    
+    <script type="module">
+        import { fetchTranscriptions, renderTranscriptionList } from './js/stt-kit.js';
+        import { initDB, fetchAllRecordings } from './js/index-db.js';
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            const listContainer = document.getElementById('transcriptionList');
+            
+            try {
+                // Initialize IndexedDB first to make it available for fetching
+                await initDB();
+
+                // Fetch from both sources concurrently for performance
+                const [cloudItems, localItems] = await Promise.all([
+                    fetchTranscriptions(),
+                    fetchAllRecordings()
+                ]);
+
+                // Merge and sort all items by timestamp, newest first
+                const allItems = [...cloudItems, ...localItems];
+                allItems.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+                renderTranscriptionList(allItems, listContainer);
+
+            } catch (error) {
+                console.error("Failed to load and render transcription history:", error);
+                listContainer.innerHTML = `<li class="empty-list-message" style="color: var(--error-color);">An error occurred while loading history. See console for details.</li>`;
+            }
+        });
+    </script>
+</body>
+</html>

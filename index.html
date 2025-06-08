@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finla.ai - Advanced Transcription UI</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <p id="loadingMessage">Processing audio...</p>
+    </div>
+
+    <header class="app-header">
+        <img src="https://finla.ai/img/logo_text.svg" alt="Finla.ai Logo" class="logo-img">
+        <div class="theme-switch-wrapper">
+            <label for="themeToggleCheckbox" style="color: var(--text-secondary); font-size: 0.8rem; margin-right: 0.5rem;">Dark Mode</label>
+            <label class="theme-switch" for="themeToggleCheckbox">
+                <input type="checkbox" id="themeToggleCheckbox" />
+                <div class="slider"></div>
+            </label>
+        </div>
+    </header>
+
+    <div class="container">
+        <main class="main-content">
+            <div class="controls-column">
+                <section class="card controls-area">
+                    <h2 class="card-title">Transcription Controls</h2>
+                    <div class="control-group">
+                        <label for="sttServiceSelect">STT Service</label>
+                        <select id="sttServiceSelect">
+                            <option value="openai_whisper">OpenAI Whisper</option>
+                            <option value="google_gemini_audio">Google Gemini (Audio Description)</option>
+                        </select>
+                    </div>
+                    <div class="button-group">
+                        <button id="startRecordBtn" class="btn btn-primary">Start Recording</button>
+                        <div class="button-row">
+                            <button id="pauseRecordBtn" class="btn btn-warning disabled" disabled>Pause</button>
+                            <button id="resumeRecordBtn" class="btn btn-primary disabled" disabled>Resume</button>
+                        </div>
+                        <button id="stopRecordBtn" class="btn btn-secondary disabled" disabled>Stop & Transcribe</button>
+                        <div class="upload-group">
+                            <button id="uploadAudioBtn" class="btn btn-upload">Upload Audio File</button>
+                            <input type="file" id="audioFileUpload" accept="audio/*,video/webm,audio/webm,audio/mp3,audio/mp4,audio/mpeg,audio/mpga,audio/m4a,audio/wav,audio/ogg">
+                            <div id="fileNameDisplay">No file selected.</div>
+                        </div>
+                    </div>
+                     <div class="topic-focus-group control-group">
+                        <h3 class="card-title">Topic Focus (Keywords)</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="topicMedical" name="topicFocus" value="medical" checked>
+                                <label for="topicMedical">Medical (Singapore)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="topicGeneral" name="topicFocus" value="general">
+                                <label for="topicGeneral">General</label>
+                            </div>
+                        </div>
+                         <p class="placeholder-note" style="font-size:0.75rem; margin-top:0.3rem;">For OpenAI and Google Gemini, topics are based on client-side keyword matching of selected focus areas.</p>
+                    </div>
+                </section>
+
+                <section class="card status-area">
+                    <h2 class="card-title">Status</h2>
+                    <div class="status-display-container">
+                        <div id="statusDisplayText" class="status-display-text">Idle. Ready to record or upload.</div>
+                    </div>
+                    <canvas id="audioVisualizerCanvas"></canvas>
+                </section>
+            </div>
+
+            <div class="transcript-column-wrapper output-column">
+                <section class="card">
+                    <h2 class="card-title">Raw Transcription</h2>
+                    <textarea id="transcriptOutputConvo" class="output-area" placeholder="Transcription results will appear here. For OpenAI, this is the plain text transcription. For Google Gemini, it's a descriptive summary with any detected speech." readonly></textarea>
+                </section>
+                <section class="card">
+                    <h2 class="card-title">Multispeaker Output</h2>
+                    <textarea id="transcriptOutputMultispeaker" class="output-area" placeholder="[0.00s - 5.32s] Segment text... (OpenAI provides time segments, but no speaker labels. Google Gemini does not provide segments or speaker labels.)" readonly></textarea>
+                    <p class="placeholder-note">Note: OpenAI Whisper output here will be time-segmented only. Google Gemini (audio description) does not provide segments or speaker labels.</p>
+                </section>
+                <section class="card">
+                    <h2 class="card-title">Detected Topics</h2>
+                    <ul id="detectedTopicsList" class="empty">
+                        <li>No topics detected yet.</li>
+                    </ul>
+                     <p class="placeholder-note">Note: Topics are based on client-side keyword matching of selected focus areas from the generated text.</p>
+                </section>
+            </div>
+        </main>
+        <section class="card recorded-audio-list-section">
+            <h2 class="card-title">Local Audio History (<a href="transcription-list.html">View All</a>)</h2>
+            <ul id="recordedAudioList">
+                <li class="empty-list-message">No recordings yet.</li>
+            </ul>
+        </section>
+    </div>
+
+    <footer class="app-footer">
+        <p>© <span id="currentYear"></span> Finla.ai. For local testing and demonstration.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
